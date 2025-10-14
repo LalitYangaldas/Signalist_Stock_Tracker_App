@@ -1,29 +1,55 @@
 "use client";
 import React, { useMemo, useState } from "react";
+import { addToWatchlist, removeFromWatchlist } from "@/lib/actions/watchlist.actions";
+import { toast } from "sonner";
 
-// Minimal WatchlistButton implementation to satisfy page requirements.
-// This component focuses on UI contract only. It toggles local state and
-// calls onWatchlistChange if provided. Styling hooks match globals.css.
+// WatchlistButton that actually persists Add/Remove to the watchlist via server actions
+// Keeps the same UI contract and calls onWatchlistChange on successful change.
 
 const WatchlistButton = ({
-                             symbol,
-                             company,
-                             isInWatchlist,
-                             showTrashIcon = false,
-                             type = "button",
-                             onWatchlistChange,
-                         }: WatchlistButtonProps) => {
+                            symbol,
+                            company,
+                            isInWatchlist,
+                            showTrashIcon = false,
+                            type = "button",
+                            onWatchlistChange,
+                        }: WatchlistButtonProps) => {
     const [added, setAdded] = useState<boolean>(!!isInWatchlist);
+    const [pending, setPending] = useState<boolean>(false);
 
     const label = useMemo(() => {
-        if (type === "icon") return added ? "" : "";
+        if (type === "icon") return ""; // icon-only, tooltip/aria convey meaning
         return added ? "Remove from Watchlist" : "Add to Watchlist";
     }, [added, type]);
 
-    const handleClick = () => {
-        const next = !added;
-        setAdded(next);
-        onWatchlistChange?.(symbol, next);
+    const handleClick = async () => {
+        if (pending) return;
+        setPending(true);
+        try {
+            if (!added) {
+                const res = await addToWatchlist(symbol, company);
+                if (res?.ok) {
+                    setAdded(true);
+                    onWatchlistChange?.(symbol, true);
+                    toast.success(`${symbol} added to watchlist`);
+                } else {
+                    toast.error(res?.error || "Failed to add to watchlist");
+                }
+            } else {
+                const res = await removeFromWatchlist(symbol);
+                if (res?.ok) {
+                    setAdded(false);
+                    onWatchlistChange?.(symbol, false);
+                    toast.success(`${symbol} removed from watchlist`);
+                } else {
+                    toast.error(res?.error || "Failed to remove from watchlist");
+                }
+            }
+        } catch (e) {
+            toast.error("Something went wrong while updating watchlist");
+        } finally {
+            setPending(false);
+        }
     };
 
     if (type === "icon") {
@@ -33,6 +59,8 @@ const WatchlistButton = ({
                 aria-label={added ? `Remove ${symbol} from watchlist` : `Add ${symbol} to watchlist`}
                 className={`watchlist-icon-btn ${added ? "watchlist-icon-added" : ""}`}
                 onClick={handleClick}
+                disabled={pending}
+                aria-busy={pending}
             >
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -53,7 +81,12 @@ const WatchlistButton = ({
     }
 
     return (
-        <button className={`watchlist-btn ${added ? "watchlist-remove" : ""}`} onClick={handleClick}>
+        <button
+            className={`watchlist-btn ${added ? "watchlist-remove" : ""}`}
+            onClick={handleClick}
+            disabled={pending}
+            aria-busy={pending}
+        >
             {showTrashIcon && added ? (
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -66,7 +99,7 @@ const WatchlistButton = ({
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 7h12M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2m-7 4v6m4-6v6m4-6v6" />
                 </svg>
             ) : null}
-            <span>{label}</span>
+            <span>{pending ? (added ? "Removing..." : "Adding...") : label}</span>
         </button>
     );
 };
