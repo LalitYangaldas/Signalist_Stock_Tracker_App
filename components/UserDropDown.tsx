@@ -64,10 +64,12 @@ const UserDropdown = ({ user, initialStocks }: {user: User, initialStocks: Stock
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="hidden sm:block bg-gray-600"/>
                 <nav className="sm:hidden">
-                    <NavItems initialStocks={[]} />
+                    <NavItems initialStocks={initialStocks} />
                 </nav>
             </DropdownMenuContent>
         </DropdownMenu>
     )
 }
 export default UserDropdown
+
+//https://cdn.jsdelivr.net/gh/alohe/avatars/png/upstream_13.png
