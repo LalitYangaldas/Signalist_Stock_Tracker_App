@@ -1,3 +1,9 @@
+<h1 align="center">
+  <a href="https://signalist-stock-tracker-app-omega.vercel.app/">
+     Signalist
+  </a>
+</h1>
+
 <h1>Introduction</h1>
 
 <p>Signalist is an AI-powered modern stock market app built with Next.js, Shadcn, Better Auth, and Inngest! Track real-time prices, explore company insights, and manage watchlists. The admin dashboard allows managing stocks, publishing news, and monitoring user activity, AI-driven daily digests, earnings notifications, and sentiment analysis—perfect for devs who want a dynamic, real-time financial platform.</p>
@@ -115,3 +121,5 @@ Open [http://localhost:3000](http://localhost:3000) in your browser to view the 
 <h3>Sign-in Page for Safety and your personal account</h3><img width="1914" height="911" alt="image" src="https://github.com/user-attachments/assets/3397309f-bd4f-4f01-9507-f7491346c936" />
 
 <h3>Sign-up page for your custom market and analytics</h3><img width="1919" height="917" alt="image" src="https://github.com/user-attachments/assets/e5910593-ec1a-4c46-95ad-f26c59fa1365" />
+
+# **[Visit Signalist](https://signalist-stock-tracker-app-omega.vercel.app/)**
